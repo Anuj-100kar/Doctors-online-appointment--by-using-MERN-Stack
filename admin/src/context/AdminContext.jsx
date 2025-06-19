@@ -7,6 +7,8 @@ export const AdminContext = createContext();
 const AdminContextProvider = (props) => {
     const [atoken, setAToken] = useState(localStorage.getItem('atoken') || null);
     const [doctors, setDoctors] = useState([]);
+    const [appointments,setAppointments]=useState([])
+    const [dashData,setDashData]=useState(null)
     
 
     
@@ -48,10 +50,24 @@ const AdminContextProvider = (props) => {
                 toast.error(data.message);
             }
         } catch (error) {
-            console.error("Error changing availability:", error); 
-            toast.error("Error changing availability: " + error.message);
+            toast.error(error.message)
         }
     };
+
+    const getallappointments=async(req,res)=>{
+        try {
+
+            const {data}=await axios.get(backendUrl+'/api/admin/appointments',{headers:{atoken}})
+
+            if(data.success){
+                setAppointments(data.appointments)
+            }else{
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
 
     useEffect(() => {
         if (atoken) {
@@ -61,14 +77,44 @@ const AdminContextProvider = (props) => {
         }
     }, [atoken]);
 
+    const cancelappointment=async(appointmentId)=>{
+        try {
+            const {data}=await axios.post(backendUrl+'/api/admin/cancel-appointment',{appointmentId},{headers:{atoken}})
+            if(data.success){
+                toast.success(data.message)
+                getallappointments()
+            }else{
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const getdashData=async()=>{
+        try {
+            const {data}=await axios.get(backendUrl+'/api/admin/dashboard',{headers:{atoken}})
+
+            if(data.success){
+                setDashData(data.dashData)
+            }else{
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
     const value = {
         atoken,
         setAToken,
         backendUrl,
         doctors,
         getalldoctors,
-        changeAvailability
-    };
+        changeAvailability,
+        appointments,setAppointments,
+        getallappointments,
+        cancelappointment,dashData,getdashData
+    }; 
 
     return (
         <AdminContext.Provider value={value}>

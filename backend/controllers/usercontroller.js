@@ -1,4 +1,4 @@
-
+import razorpay from 'razorpay'
 import validator from 'validator'
 import bcrypt from 'bcrypt'
 import userModel from '../models/userModel.js'
@@ -6,11 +6,13 @@ import jwt from 'jsonwebtoken'
 import {v2 as cloudinary} from 'cloudinary'
 import doctorModel from '../models/doctorModel.js'
 import appointmentModel from '../models/AppointmentModel.js'
-import razorpay from 'razorpay'
 
 
 
 
+console.log(process.env)
+
+console.log(process.env)
 const registeruser=async(req,res)=>{
     try {
         
@@ -198,7 +200,7 @@ const bookappointment=async(req,res)=>{
             slotDate,
             date:Date.now(),
             isCompleted:false,
-            payment:'pending',
+            payment:false,
             cancelled:false,
 
         }
@@ -217,9 +219,7 @@ const bookappointment=async(req,res)=>{
     }
 }
 
-//api to get user appointment for frontend my-appoiontment 
 
-//api to get user appointment for frontend my-appoiontment 
 
 const listappointment=async(req,res)=>{
     try {
@@ -265,11 +265,65 @@ const cancelappointment=async(req,res)=>{
     }
 }
 
-const razorpayInstance=new razorpay({
-    key_id:'',
-    key_secret:''
-})
-const paymentRazorpay=(req,res)=>{
+ 
+const paymentRazorpay=async(req,res)=>{
 
+    
+    try {
+        const razorpayInstance=new razorpay({
+    key_id:process.env.RAZORPAY_KEY_ID,
+    key_secret:process.env.RAZORPAY_KEY_SECRET
+})
+       
+        
+        const {appointmentId}=req.body
+
+    const appointmentdata=await appointmentModel.findById(appointmentId)
+
+    if(!appointmentdata || appointmentdata.cancelled){
+        return res.json({success:false,message:'appointment cancelled or not found'})
+    }
+
+    //creating options for payment
+    const options={
+        amount:appointmentdata.amount*100,
+        currency:process.env.CURRENCY,
+        receipt:appointmentId,
+    }
+    //order 
+    const order=await razorpayInstance.orders.create(options)
+
+    res.json({success:true,order})
+
+    } catch (error) {
+        console.error( error);
+        res.json({ success: false, message: error.message });
+    }
 }
-export {registeruser ,loginuser,getprofile ,updateuserprofile , bookappointment,listappointment,cancelappointment}
+
+//to verify razorpay payment
+const verifyrazorpay=async(req,res)=>{
+    try {
+        const razorpayInstance=new razorpay({
+    key_id:process.env.RAZORPAY_KEY_ID,
+    key_secret:process.env.RAZORPAY_KEY_SECRET
+})
+        const {razorpay_order_id}=req.body
+        const orderinfo=await razorpayInstance.orders.fetch(razorpay_order_id)
+
+
+        if(orderinfo.status==='paid'){
+            await appointmentModel.findByIdAndUpdate(orderinfo.receipt,{payment:true})
+            res.json({success:true,message:'payment successful'})
+
+        }else{
+             res.json({success:false,message:'payment failed'})
+        }
+    
+        
+    } catch (error) {
+         console.error( error);
+        res.json({ success: false, message: error.message });
+    }
+}
+export {registeruser ,loginuser,getprofile ,updateuserprofile , bookappointment,listappointment,cancelappointment,paymentRazorpay,verifyrazorpay}
