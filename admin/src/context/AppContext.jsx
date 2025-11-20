@@ -4,7 +4,7 @@ export const AppContext = createContext()
 
 const AppContextProvider = (props) => {
 
-    const backendUrl = "http://localhost:4000";
+    const backendUrl = "https://doctors-appointment-backend-wu75.onrender.com";
     const currency='$'
     const calculateage = (dob) => {
         const today = new Date()
