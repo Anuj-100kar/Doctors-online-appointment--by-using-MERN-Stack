@@ -68,11 +68,11 @@ function Appointment() {
       return navigate('/login')
       
     }
-     if (!userData || !userData._id) { // Check if userData exists and has an _id
-        console.error("User data is missing or incomplete:", userData); // Add this for debugging
-        toast.error('User information missing. Please log in again.');
-        return navigate('/login');
-    }
+    //  if (!userData || !userData._id) { // Check if userData exists and has an _id
+    //     console.error(userData); // Add this for debugging
+    //     toast.error('User information missing. Please log in again.');
+    //     return navigate('/login');
+    // }
 
     const userId = userData._id; // Get userId from userData
     const appointmentUserData = { // Rename to avoid confusion with AppContext's userData
@@ -93,7 +93,7 @@ function Appointment() {
       console.log("Value of backendUrl:", backendUrl);
         const fullUrl = backendUrl + '/api/user/book-appointment';
         console.log("Attempting to post to URL:", fullUrl);
-     const {data}=await axios.post(fullUrl,{docId,slotDate,slotTime,userData:appointmentUserData,userId},{headers:{token}})
+     const {data}=await axios.post(fullUrl,{docId,slotDate,slotTime,userData:appointmentUserData,userId},{headers:{Authorization:`Bearer ${token}`}})
      if(data.success){
       toast.success(data.message)
       getdoctorsdata()

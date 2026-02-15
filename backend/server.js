@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 
 import express from 'express'
 
@@ -14,6 +15,7 @@ const port =process.env.PORT || 4000
 
 
 console.log('--- Server Start Environment Check ---');
+// eslint-disable-next-line no-undef
 console.log('RAZORPAY_KEY_ID:', process.env.RAZORPAY_KEY_ID ? 'Loaded' : 'UNDEFINED');
 console.log('RAZORPAY_KEY_SECRET:', process.env.RAZORPAY_KEY_SECRET ? 'Loaded' : 'UNDEFINED');
 console.log('CURRENCY:', process.env.CURRENCY ? 'Loaded' : 'UNDEFINED');
