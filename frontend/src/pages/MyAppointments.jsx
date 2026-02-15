@@ -26,7 +26,7 @@ function MyAppointments() {
    
     try {
        console.log("MyAppointments: Attempting to fetch user appointments. Token available:", !!token);
-      const {data}=await axios.get(backendUrl+'/api/user/appointments',{headers:{token}})
+      const {data}=await axios.get(backendUrl+'/api/user/appointments',{headers:{Authorization:`Bearer ${token}`}})
 
       if(data.success){
         setAppointments(data.appointments.reverse())
@@ -41,7 +41,7 @@ function MyAppointments() {
 
   const cancelappointment=async(appointmentId)=>{
     try {
-      const {data}=await axios.post(backendUrl+'/api/user/cancel-appointment',{appointmentId},{headers:{token}})
+      const {data}=await axios.post(backendUrl+'/api/user/cancel-appointment',{appointmentId},{headers:{Authorization:`Bearer ${token}`}})
 
       if(data.success){
         toast.success(data.message)
@@ -100,7 +100,7 @@ function MyAppointments() {
 
   const appointmentRazorpay=async(appointmentId)=>{
     try {
-      const {data}=await axios.post(backendUrl+'/api/user/payment-razorpay',{appointmentId},{headers:{token}})
+      const {data}=await axios.post(backendUrl+'/api/user/payment-razorpay',{appointmentId},{headers:{Authorization:`Bearer ${token}`}})
 
       if(data.success){
         initpay(data.order)
