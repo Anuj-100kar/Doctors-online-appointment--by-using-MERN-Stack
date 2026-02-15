@@ -73,7 +73,7 @@ function MyAppointments() {
       handler: async (response) => {
         console.log(response);
         try {
-          const { data } = await axios.post(backendUrl + '/api/user/verify-razorpay',response , { headers: { token } });
+          const { data } = await axios.post(backendUrl + '/api/user/verify-razorpay',response , { headers: { Authorization:`Bearer ${token}`} });
 
           if (data.success) {
             toast.success(data.message);
